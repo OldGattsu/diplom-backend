@@ -1,23 +1,40 @@
 package config
 
 import (
+	"diplom/pkg/logging"
 	"github.com/cristalhq/aconfig"
+	"github.com/cristalhq/aconfig/aconfigyaml"
 )
 
 type Config struct {
-	IsDebug bool
+	IsDebug bool `yaml:"is_debug"`
 	Listen  struct {
 		Type   string `yaml:"type"`
 		BindIP string `yaml:"bind_ip"`
 		Port   string `yaml:"port"`
 	} `yaml:"listen"`
+	Storage `yaml:"storage"`
 }
 
-func GetConfig() aconfig.Loader {
-	var cfg Config
+type Storage struct {
+	Host     string `yaml:"host"`
+	Port     string `yaml:"port"`
+	Database string `yaml:"database"`
+	Username string `yaml:"username"`
+	Password string `yaml:"password"`
+}
 
-	loader := aconfig.LoaderFor(&cfg, aconfig.Config{
-		Files: []string{"/config.yaml"},
+func GetConfig() *Config {
+	cfg := &Config{}
+
+	logger := logging.GetLogger()
+	logger.Info("read application configuration")
+
+	loader := aconfig.LoaderFor(cfg, aconfig.Config{
+		Files: []string{"config.yaml"},
+		FileDecoders: map[string]aconfig.FileDecoder{
+			".yaml": aconfigyaml.New(),
+		},
 	})
 
 	err := loader.Load()
@@ -25,6 +42,5 @@ func GetConfig() aconfig.Loader {
 		panic(err)
 	}
 
-	return *loader
+	return cfg
 }
-
