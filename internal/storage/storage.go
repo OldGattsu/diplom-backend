@@ -2,11 +2,15 @@ package storage
 
 import (
 	"errors"
+
 	"github.com/jackc/pgx/v4/pgxpool"
 	"go.uber.org/zap"
 )
 
-var ErrUserNotFound = errors.New("user not found")
+var (
+	ErrUserNotFound = errors.New("user not found")
+	ErrBookNotFound = errors.New("book not found")
+)
 
 type Storage struct {
 	db     *pgxpool.Pool

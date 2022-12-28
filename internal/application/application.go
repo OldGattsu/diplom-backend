@@ -38,6 +38,7 @@ func (app *Application) Run(ctx context.Context, cancel context.CancelFunc, wg *
 
 	r.Group(func(r chi.Router) {
 		r.Use(app.middlewareAuth)
+		r.Get("/book/{id}", app.handlerGetBook)
 		r.Get("/books", app.handlerGetBooks)
 
 		r.Group(func(r chi.Router) {
