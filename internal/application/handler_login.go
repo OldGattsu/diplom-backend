@@ -70,6 +70,5 @@ func (app *Application) handlerLogin(rw http.ResponseWriter, req *http.Request) 
 		return
 	}
 
-	rw.Header().Add("content-type", "application/json")
 	rw.Write(data)
 }

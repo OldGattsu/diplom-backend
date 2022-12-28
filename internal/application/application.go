@@ -10,6 +10,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"go.uber.org/zap"
 
+	"github.com/oldgattsu/diplom2/internal/models"
 	"github.com/oldgattsu/diplom2/internal/storage"
 )
 
@@ -31,8 +32,14 @@ func (app *Application) Run(ctx context.Context, cancel context.CancelFunc, wg *
 	defer wg.Done()
 
 	r := chi.NewRouter()
+	r.Use(app.middlewareResponseHeaders)
 
 	r.Post("/login", app.handlerLogin)
+	r.Group(func(r chi.Router) {
+		r.Use(app.middlewareAuth)
+		r.Get("/books", app.handlerGetBooks)
+		r.Post("/book", app.handlerAddBook)
+	})
 
 	server := http.Server{
 		Handler: r,
@@ -61,4 +68,16 @@ func (app *Application) Run(ctx context.Context, cancel context.CancelFunc, wg *
 	if errShutdown != nil {
 		app.logger.Error("error shutdown server", zap.Error(errShutdown))
 	}
+}
+
+func (app *Application) middlewareResponseHeaders(handler http.Handler) http.Handler {
+	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		rw.Header().Add("content-type", "application/json")
+		// todo: add CORS headers
+		handler.ServeHTTP(rw, req)
+	})
+}
+
+func getUserFromContext(ctx context.Context) *models.User {
+	return ctx.Value(contextKeyUser).(*models.User)
 }
