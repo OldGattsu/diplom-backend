@@ -35,10 +35,16 @@ func (app *Application) Run(ctx context.Context, cancel context.CancelFunc, wg *
 	r.Use(app.middlewareResponseHeaders)
 
 	r.Post("/login", app.handlerLogin)
+
 	r.Group(func(r chi.Router) {
 		r.Use(app.middlewareAuth)
 		r.Get("/books", app.handlerGetBooks)
-		r.Post("/book", app.handlerAddBook)
+
+		r.Group(func(r chi.Router) {
+			r.Use(app.middlewareIsAdmin)
+			r.Post("/book", app.handlerAddBook)
+		})
+
 	})
 
 	server := http.Server{
@@ -68,14 +74,6 @@ func (app *Application) Run(ctx context.Context, cancel context.CancelFunc, wg *
 	if errShutdown != nil {
 		app.logger.Error("error shutdown server", zap.Error(errShutdown))
 	}
-}
-
-func (app *Application) middlewareResponseHeaders(handler http.Handler) http.Handler {
-	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-		rw.Header().Add("content-type", "application/json")
-		// todo: add CORS headers
-		handler.ServeHTTP(rw, req)
-	})
 }
 
 func getUserFromContext(ctx context.Context) *models.User {

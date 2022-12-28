@@ -19,7 +19,7 @@ func (s *Storage) GetUserByToken(ctx context.Context, token string) (*models.Use
 
 	u := &models.User{}
 
-	errScan := row.Scan(&u.ID, &u.Name, &u.Email)
+	errScan := row.Scan(&u.ID, &u.Name, &u.Email, &u.IsAdmin)
 	if errScan != nil {
 		if errors.Is(errScan, pgx.ErrNoRows) {
 			return nil, ErrUserNotFound
