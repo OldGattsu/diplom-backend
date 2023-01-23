@@ -16,14 +16,17 @@ func (s *Storage) GetUser(ctx context.Context, email, password string) (*models.
 	u := &models.User{}
 	var passwordDB string
 
+	//hash, _ := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	fmt.Printf("hash: %s", password)
+
 	errScan := row.Scan(&u.ID, &u.Name, &u.Email, &passwordDB, &u.IsAdmin)
+	fmt.Printf("passwordDB: %s", passwordDB)
 	if errScan != nil {
 		if errors.Is(errScan, pgx.ErrNoRows) {
 			return nil, ErrUserNotFound
 		}
 		return nil, fmt.Errorf("error scan, %w", errScan)
 	}
-
 	errPassword := bcrypt.CompareHashAndPassword([]byte(passwordDB), []byte(password))
 	if errPassword != nil {
 		return nil, ErrUserNotFound

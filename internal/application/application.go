@@ -40,10 +40,13 @@ func (app *Application) Run(ctx context.Context, cancel context.CancelFunc, wg *
 		r.Use(app.middlewareAuth)
 		r.Get("/book/{id}", app.handlerGetBook)
 		r.Get("/books", app.handlerGetBooks)
+		r.Get("/author/{id}", app.handlerGetAuthor)
+		r.Get("/authors", app.handlerGetAuthors)
 
 		r.Group(func(r chi.Router) {
 			r.Use(app.middlewareIsAdmin)
 			r.Post("/book", app.handlerAddBook)
+			r.Post("/author", app.handlerAddAuthor)
 		})
 
 	})

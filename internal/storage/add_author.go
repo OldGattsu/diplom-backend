@@ -6,8 +6,8 @@ import (
 	"github.com/oldgattsu/diplom2/internal/models"
 )
 
-func (s *Storage) AddBook(ctx context.Context, b *models.Book) (int, error) {
-	row := s.db.QueryRow(ctx, "INSERT INTO books (name) VALUES ($1) RETURNING id;", b.Name)
+func (s *Storage) AddAuthor(ctx context.Context, a *models.Author) (int, error) {
+	row := s.db.QueryRow(ctx, "INSERT INTO authors (name) VALUES ($1) RETURNING id;", a.Name)
 
 	var id int
 	errScan := row.Scan(&id)

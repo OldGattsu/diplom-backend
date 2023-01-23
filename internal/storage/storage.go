@@ -8,8 +8,9 @@ import (
 )
 
 var (
-	ErrUserNotFound = errors.New("user not found")
-	ErrBookNotFound = errors.New("book not found")
+	ErrUserNotFound   = errors.New("user not found")
+	ErrBookNotFound   = errors.New("book not found")
+	ErrAuthorNotFound = errors.New("author not found")
 )
 
 type Storage struct {
