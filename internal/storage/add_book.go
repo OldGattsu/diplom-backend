@@ -3,17 +3,41 @@ package storage
 import (
 	"context"
 	"fmt"
-	"github.com/oldgattsu/diplom2/internal/models"
+
+	"github.com/jackc/pgx/v4"
 )
 
-func (s *Storage) AddBook(ctx context.Context, b *models.Book) (int, error) {
+type AddBookQuery struct {
+	Name    string `json:"name"`
+	Authors []int  `json:"authors"`
+}
+
+func (s *Storage) AddBook(ctx context.Context, b *AddBookQuery) (int, error) {
 	row := s.db.QueryRow(ctx, "INSERT INTO books (name) VALUES ($1) RETURNING id;", b.Name)
 
-	var id int
-	errScan := row.Scan(&id)
+	var bookID int
+	errScan := row.Scan(&bookID)
 	if errScan != nil {
 		return 0, fmt.Errorf("error scan, %w", errScan)
 	}
 
-	return id, nil
+	var rows [][]interface{}
+	for _, authorID := range b.Authors {
+		rows = append(rows, []interface{}{
+			bookID,
+			authorID,
+		})
+	}
+
+	_, copyFromErr := s.db.CopyFrom(
+		ctx,
+		pgx.Identifier{"book_author"},
+		[]string{"book_id", "author_id"},
+		pgx.CopyFromRows(rows),
+	)
+	if copyFromErr != nil {
+		return 0, fmt.Errorf("query error, %w", copyFromErr)
+	}
+
+	return bookID, nil
 }

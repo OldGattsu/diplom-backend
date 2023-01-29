@@ -7,9 +7,9 @@ func (app *Application) middlewareResponseHeaders(handler http.Handler) http.Han
 		rw.Header().Add("content-type", "application/json")
 		rw.Header().Add("Access-Control-Allow-Origin", "*")
 		rw.Header().Add("Access-Control-Allow-Credentials", "true")
-		rw.Header().Add("Access-Control-Allow-Methods", "*")
+		rw.Header().Add("Access-Control-Allow-Methods", "GET,HEAD,PUT,PATCH,POST,DELETE")
 		rw.Header().Add("Access-Control-Allow-Headers", "*")
-		// todo: add CORS headers
+		rw.Header().Add("Access-Control-Expose-Headers", "*")
 		handler.ServeHTTP(rw, req)
 	})
 }

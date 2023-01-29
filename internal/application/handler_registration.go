@@ -2,52 +2,50 @@ package application
 
 import (
 	"encoding/json"
-	"errors"
 	"github.com/oldgattsu/diplom2/internal/models"
-	"io"
+	"github.com/oldgattsu/diplom2/internal/storage"
 	"net/http"
 
 	"github.com/google/uuid"
 	"go.uber.org/zap"
-
-	"github.com/oldgattsu/diplom2/internal/storage"
 )
 
-type loginRequest struct {
+type registrationRequest struct {
+	Name     string `json:"name"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
-type loginResponse struct {
-	User  *models.User
+type registrationResponse struct {
 	Token string `json:"token"`
+	User  *models.User
 }
 
-func (app *Application) handlerLogin(rw http.ResponseWriter, req *http.Request) {
-	app.logger.Debug("handler login")
+func (app *Application) handlerRegistration(rw http.ResponseWriter, req *http.Request) {
+	app.logger.Debug("handler registration")
 
-	body, errReadBody := io.ReadAll(req.Body)
-	if errReadBody != nil {
-		app.logger.Error("error read request body", zap.Error(errReadBody))
-		http.Error(rw, "error read body", http.StatusInternalServerError)
-		return
-	}
+	r := registrationRequest{}
 
-	r := loginRequest{}
-
-	errUnmarshal := json.Unmarshal(body, &r)
+	errUnmarshal := json.NewDecoder(req.Body).Decode(&r)
 	if errUnmarshal != nil {
-		app.logger.Error("error unmarshal request body", zap.Error(errReadBody))
-		http.Error(rw, "error unmarshal body", http.StatusBadRequest)
+		http.Error(rw, "bad request", http.StatusBadRequest)
 		return
 	}
 
-	u, errUser := app.store.GetUser(req.Context(), r.Email, r.Password)
+	uq := &storage.AddUserQuery{
+		Name:     r.Name,
+		Email:    r.Email,
+		Password: r.Password,
+		IsAdmin:  false,
+	}
+
+	u, errUser := app.store.AddUser(req.Context(), uq)
 	if errUser != nil {
-		if errors.Is(errUser, storage.ErrUserNotFound) {
-			http.Error(rw, "unauthorized", http.StatusUnauthorized)
-			return
-		}
+		// todo обработать ошибку нормально
+		//if errors.Is(errUser, storage.ErrUserNotFound) {
+		//	http.Error(rw, "unauthorized", http.StatusUnauthorized)
+		//	return
+		//}
 
 		app.logger.Error("error query db", zap.Error(errUser))
 		http.Error(rw, "error query db", http.StatusInternalServerError)
@@ -63,9 +61,9 @@ func (app *Application) handlerLogin(rw http.ResponseWriter, req *http.Request) 
 		return
 	}
 
-	resp := loginResponse{
-		User:  u,
+	resp := registrationResponse{
 		Token: token,
+		User:  u,
 	}
 
 	data, errMarshal := json.Marshal(resp)

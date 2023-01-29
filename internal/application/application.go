@@ -35,11 +35,12 @@ func (app *Application) Run(ctx context.Context, cancel context.CancelFunc, wg *
 	r.Use(app.middlewareResponseHeaders)
 
 	r.Post("/login", app.handlerLogin)
+	r.Post("/registration", app.handlerRegistration)
+	r.Get("/books", app.handlerGetBooks)
 
 	r.Group(func(r chi.Router) {
 		r.Use(app.middlewareAuth)
 		r.Get("/book/{id}", app.handlerGetBook)
-		r.Get("/books", app.handlerGetBooks)
 		r.Get("/author/{id}", app.handlerGetAuthor)
 		r.Get("/authors", app.handlerGetAuthors)
 
