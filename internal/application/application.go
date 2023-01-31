@@ -36,17 +36,20 @@ func (app *Application) Run(ctx context.Context, cancel context.CancelFunc, wg *
 
 	r.Post("/login", app.handlerLogin)
 	r.Post("/registration", app.handlerRegistration)
-	r.Get("/books", app.handlerGetBooks)
 
 	r.Group(func(r chi.Router) {
 		r.Use(app.middlewareAuth)
+		r.Get("/books", app.handlerGetBooks)
 		r.Get("/book/{id}", app.handlerGetBook)
 		r.Get("/author/{id}", app.handlerGetAuthor)
 		r.Get("/authors", app.handlerGetAuthors)
+		r.Get("/comments/{id}", app.handlerGetComments)
+		r.Post("/comment", app.handlerAddComment)
 
 		r.Group(func(r chi.Router) {
 			r.Use(app.middlewareIsAdmin)
 			r.Post("/book", app.handlerAddBook)
+			r.Delete("/book/{id}", app.handlerDeleteBook)
 			r.Post("/author", app.handlerAddAuthor)
 		})
 

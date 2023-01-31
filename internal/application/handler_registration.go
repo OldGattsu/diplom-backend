@@ -17,8 +17,8 @@ type registrationRequest struct {
 }
 
 type registrationResponse struct {
-	Token string `json:"token"`
-	User  *models.User
+	Token string       `json:"token"`
+	User  *models.User `json:"user"`
 }
 
 func (app *Application) handlerRegistration(rw http.ResponseWriter, req *http.Request) {

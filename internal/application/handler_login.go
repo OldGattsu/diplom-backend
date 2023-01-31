@@ -19,8 +19,8 @@ type loginRequest struct {
 }
 
 type loginResponse struct {
-	User  *models.User
-	Token string `json:"token"`
+	User  *models.User `json:"user"`
+	Token string       `json:"token"`
 }
 
 func (app *Application) handlerLogin(rw http.ResponseWriter, req *http.Request) {
