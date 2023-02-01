@@ -11,11 +11,11 @@ import (
 )
 
 func (s *Storage) GetBook(ctx context.Context, bookID int) (*models.Book, error) {
-	row := s.db.QueryRow(ctx, "SELECT id, name, description FROM books WHERE id = $1", bookID)
+	row := s.db.QueryRow(ctx, "SELECT id, name, description, poster FROM books WHERE id = $1", bookID)
 
 	b := &models.Book{}
 
-	errScan := row.Scan(&b.ID, &b.Name, &b.Description)
+	errScan := row.Scan(&b.ID, &b.Name, &b.Description, &b.Poster)
 	if errScan != nil {
 		if errors.Is(errScan, pgx.ErrNoRows) {
 			return nil, ErrBookNotFound

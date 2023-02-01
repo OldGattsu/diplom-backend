@@ -8,7 +8,7 @@ import (
 )
 
 func (s *Storage) GetBooks(ctx context.Context) ([]*models.Book, error) {
-	rows, errQuery := s.db.Query(ctx, "SELECT id, name FROM books")
+	rows, errQuery := s.db.Query(ctx, "SELECT id, name, description, poster FROM books")
 	if errQuery != nil {
 		return nil, fmt.Errorf("query error, %w", errQuery)
 	}
@@ -18,7 +18,7 @@ func (s *Storage) GetBooks(ctx context.Context) ([]*models.Book, error) {
 	for rows.Next() {
 		b := &models.Book{}
 
-		errScan := rows.Scan(&b.ID, &b.Name)
+		errScan := rows.Scan(&b.ID, &b.Name, &b.Description, &b.Poster)
 		if errScan != nil {
 			return nil, fmt.Errorf("scan error, %w", errScan)
 		}

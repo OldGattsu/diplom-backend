@@ -8,12 +8,14 @@ import (
 )
 
 type AddBookQuery struct {
-	Name    string `json:"name"`
-	Authors []int  `json:"authors"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Poster      string `json:"poster"`
+	Authors     []int  `json:"authors"`
 }
 
 func (s *Storage) AddBook(ctx context.Context, b *AddBookQuery) (int, error) {
-	row := s.db.QueryRow(ctx, "INSERT INTO books (name) VALUES ($1) RETURNING id;", b.Name)
+	row := s.db.QueryRow(ctx, "INSERT INTO books (name, description, poster) VALUES ($1, $2, $3) RETURNING id;", b.Name, b.Description, b.Poster)
 
 	var bookID int
 	errScan := row.Scan(&bookID)

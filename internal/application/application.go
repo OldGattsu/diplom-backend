@@ -49,10 +49,12 @@ func (app *Application) Run(ctx context.Context, cancel context.CancelFunc, wg *
 		r.Group(func(r chi.Router) {
 			r.Use(app.middlewareIsAdmin)
 			r.Post("/book", app.handlerAddBook)
+			r.Put("/book", app.handlerUpdateBook)
 			r.Delete("/book/{id}", app.handlerDeleteBook)
 			r.Post("/author", app.handlerAddAuthor)
 		})
 
+		//r.Handle("/uploads/images/*", http.StripPrefix("/static", http.FileServer("")))
 	})
 
 	server := http.Server{
