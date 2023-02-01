@@ -7,23 +7,23 @@ import (
 	"github.com/oldgattsu/diplom2/internal/models"
 )
 
-func (s *Storage) GetAuthors(ctx context.Context) ([]*models.Author, error) {
-	rows, errQuery := s.db.Query(ctx, "SELECT id, name, description FROM authors")
+func (s *Storage) GetUsers(ctx context.Context) ([]*models.User, error) {
+	rows, errQuery := s.db.Query(ctx, "SELECT id, name, is_blocked FROM users")
 	if errQuery != nil {
 		return nil, fmt.Errorf("query error, %w", errQuery)
 	}
 
-	var res []*models.Author
+	var res []*models.User
 
 	for rows.Next() {
-		b := &models.Author{}
+		u := &models.User{}
 
-		errScan := rows.Scan(&b.ID, &b.Name, &b.Description)
+		errScan := rows.Scan(&u.ID, &u.Name, &u.IsBlocked)
 		if errScan != nil {
 			return nil, fmt.Errorf("scan error, %w", errScan)
 		}
 
-		res = append(res, b)
+		res = append(res, u)
 	}
 
 	return res, nil

@@ -2,10 +2,10 @@ package application
 
 import (
 	"encoding/json"
-	"github.com/oldgattsu/diplom2/internal/storage"
+	"go.uber.org/zap"
 	"net/http"
 
-	"go.uber.org/zap"
+	"github.com/oldgattsu/diplom2/internal/storage"
 )
 
 type updateBookRequest struct {
@@ -18,7 +18,7 @@ type updateBookRequest struct {
 func (app *Application) handlerUpdateBook(rw http.ResponseWriter, req *http.Request) {
 	app.logger.Debug("handler update book")
 
-	r := updateBookRequest{}
+	r := &updateBookRequest{}
 
 	errUnmarshal := json.NewDecoder(req.Body).Decode(&r)
 	if errUnmarshal != nil {

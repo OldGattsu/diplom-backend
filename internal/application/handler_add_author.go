@@ -10,7 +10,8 @@ import (
 )
 
 type addAuthorRequest struct {
-	Name string `json:"name"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
 }
 
 func (app *Application) handlerAddAuthor(rw http.ResponseWriter, req *http.Request) {
@@ -28,7 +29,8 @@ func (app *Application) handlerAddAuthor(rw http.ResponseWriter, req *http.Reque
 	}
 
 	a := &models.Author{
-		Name: r.Name,
+		Name:        r.Name,
+		Description: r.Description,
 	}
 
 	authorID, errAddAuthor := app.store.AddAuthor(req.Context(), a)

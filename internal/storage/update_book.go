@@ -13,29 +13,11 @@ type UpdateBookQuery struct {
 }
 
 func (s *Storage) UpdateBook(ctx context.Context, b *UpdateBookQuery) error {
-	_, err := s.db.Query(ctx, "UPDATE books SET name = $2, description = $3, authors = $4 WHERE id = $1", b.ID)
+	_, err := s.db.Exec(ctx, "UPDATE books SET name = $2, description = $3 WHERE id = $1", b.ID, b.Name, b.Description)
 
 	if err != nil {
-		return fmt.Errorf("error scan, %w", err)
+		return fmt.Errorf("error update book, %w", err)
 	}
-
-	//var rows [][]interface{}
-	//for _, authorID := range b.Authors {
-	//	rows = append(rows, []interface{}{
-	//		bookID,
-	//		authorID,
-	//	})
-	//}
-	//
-	//_, copyFromErr := s.db.CopyFrom(
-	//	ctx,
-	//	pgx.Identifier{"book_author"},
-	//	[]string{"book_id", "author_id"},
-	//	pgx.CopyFromRows(rows),
-	//)
-	//if copyFromErr != nil {
-	//	return 0, fmt.Errorf("query error, %w", copyFromErr)
-	//}
 
 	return nil
 }

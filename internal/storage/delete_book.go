@@ -6,10 +6,14 @@ import (
 )
 
 func (s *Storage) DeleteBook(ctx context.Context, bookID int) error {
-	_, err := s.db.Query(ctx, "DELETE FROM books WHERE id = $1", bookID)
+	_, deleteBookErr := s.db.Query(ctx, "DELETE FROM books WHERE id = $1", bookID)
+	if deleteBookErr != nil {
+		return fmt.Errorf("delete book error, %w", deleteBookErr)
+	}
 
-	if err != nil {
-		return fmt.Errorf("scan error, %w", err)
+	_, deleteBookCommentsErr := s.db.Query(ctx, "DELETE FROM comments WHERE book_id = $1", bookID)
+	if deleteBookCommentsErr != nil {
+		return fmt.Errorf("delete comments error, %w", deleteBookCommentsErr)
 	}
 
 	return nil

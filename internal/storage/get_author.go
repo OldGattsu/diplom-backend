@@ -11,11 +11,11 @@ import (
 )
 
 func (s *Storage) GetAuthor(ctx context.Context, authorID int) (*models.Author, error) {
-	row := s.db.QueryRow(ctx, "SELECT id, name FROM authors WHERE id = $1", authorID)
+	row := s.db.QueryRow(ctx, "SELECT id, name, description FROM authors WHERE id = $1", authorID)
 
 	b := &models.Author{}
 
-	errScan := row.Scan(&b.ID, &b.Name)
+	errScan := row.Scan(&b.ID, &b.Name, &b.Description)
 	if errScan != nil {
 		if errors.Is(errScan, pgx.ErrNoRows) {
 			return nil, ErrAuthorNotFound

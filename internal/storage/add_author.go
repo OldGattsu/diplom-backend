@@ -8,7 +8,7 @@ import (
 )
 
 func (s *Storage) AddAuthor(ctx context.Context, a *models.Author) (int, error) {
-	row := s.db.QueryRow(ctx, "INSERT INTO authors (name) VALUES ($1) RETURNING id;", a.Name)
+	row := s.db.QueryRow(ctx, "INSERT INTO authors (name, description) VALUES ($1, $2) RETURNING id;", a.Name, a.Description)
 
 	var id int
 	errScan := row.Scan(&id)

@@ -1,22 +1,13 @@
 package application
 
 import (
-	"bytes"
-	b64 "encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/google/uuid"
-	"github.com/oldgattsu/diplom2/internal/config"
+	"github.com/oldgattsu/diplom2/internal/imageUploader"
 	"github.com/oldgattsu/diplom2/internal/models"
 	"github.com/oldgattsu/diplom2/internal/storage"
 	"go.uber.org/zap"
-	"image"
-	"image/jpeg"
-	"image/png"
-	"log"
 	"net/http"
-	"os"
-	"strings"
 )
 
 type addBookRequest struct {
@@ -33,39 +24,11 @@ func (app *Application) handlerAddBook(rw http.ResponseWriter, req *http.Request
 
 	errUnmarshal := json.NewDecoder(req.Body).Decode(&r)
 
-	index := strings.Index(r.Poster, "base64,")
-	posterBase64, _ := b64.StdEncoding.DecodeString(r.Poster[index+7:])
-	reader := bytes.NewReader(posterBase64)
-
-	image, format, imageDecodeErr := image.Decode(reader)
-	if imageDecodeErr != nil {
-		fmt.Printf("error: %v", imageDecodeErr)
+	imageURL, uploadImageError := imageUploader.Load(r.Poster)
+	if uploadImageError != nil {
+		fmt.Printf("error: %v", uploadImageError)
 		return
 	}
-	fmt.Printf("image format: %v", format)
-
-	dir := "static"
-	uniqueFileName := uuid.New().String()
-	fullFileName := fmt.Sprintf("%s/%s.%s", dir, uniqueFileName, format)
-
-	f, openFilerErr := os.OpenFile(fullFileName, os.O_WRONLY|os.O_CREATE, 0777)
-	if openFilerErr != nil {
-		fmt.Printf("error: %v", openFilerErr)
-		return
-	}
-
-	switch format {
-	case "png":
-		png.Encode(f, image)
-	case "jpeg":
-		jpeg.Encode(f, image, nil)
-	}
-
-	cfg, errCfg := config.Load()
-	if errCfg != nil {
-		log.Printf("error load config, %v", errCfg)
-	}
-	imageURL := fmt.Sprintf("http://%s/%s", cfg.Address, fullFileName)
 
 	if errUnmarshal != nil {
 		http.Error(rw, "bad request", http.StatusBadRequest)

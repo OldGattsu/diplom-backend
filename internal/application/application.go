@@ -52,6 +52,10 @@ func (app *Application) Run(ctx context.Context, cancel context.CancelFunc, wg *
 			r.Put("/book", app.handlerUpdateBook)
 			r.Delete("/book/{id}", app.handlerDeleteBook)
 			r.Post("/author", app.handlerAddAuthor)
+			r.Get("/users", app.handlerGetUsers)
+			r.Post("/user-block", app.handlerBlockUser)
+			r.Get("/all-comments", app.handlerGetAllComments)
+			r.Delete("/comment/{id}", app.handlerDeleteComment)
 		})
 	})
 
