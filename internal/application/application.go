@@ -53,9 +53,9 @@ func (app *Application) Run(ctx context.Context, cancel context.CancelFunc, wg *
 			r.Delete("/book/{id}", app.handlerDeleteBook)
 			r.Post("/author", app.handlerAddAuthor)
 		})
-
-		//r.Handle("/uploads/images/*", http.StripPrefix("/static", http.FileServer("")))
 	})
+
+	r.Handle("/static/*", http.StripPrefix("/static", http.FileServer(http.Dir("static"))))
 
 	server := http.Server{
 		Handler: r,

@@ -44,7 +44,7 @@ func (app *Application) handlerAddBook(rw http.ResponseWriter, req *http.Request
 	}
 	fmt.Printf("image format: %v", format)
 
-	dir := "upload/images"
+	dir := "static"
 	uniqueFileName := uuid.New().String()
 	fullFileName := fmt.Sprintf("%s/%s.%s", dir, uniqueFileName, format)
 
@@ -65,7 +65,7 @@ func (app *Application) handlerAddBook(rw http.ResponseWriter, req *http.Request
 	if errCfg != nil {
 		log.Printf("error load config, %v", errCfg)
 	}
-	imageURL := fmt.Sprintf("%s/%s", cfg.Address, fullFileName)
+	imageURL := fmt.Sprintf("http://%s/%s", cfg.Address, fullFileName)
 
 	if errUnmarshal != nil {
 		http.Error(rw, "bad request", http.StatusBadRequest)
